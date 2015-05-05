@@ -20,13 +20,15 @@ struct parser {
 
   parser(tokenizer& lex) : lexer(lex), current(nullptr) {}
 
+  template<typename Parser>
   ast parse(std::istream& input) { 
-    lexer.set_input(input); 
+    lexer.set_input(input);
+    Parser parser(lexer);
     next_token();
-    return parse_expression();
+    return parser.parse();
   }
 
-  void register_token(std::string reg_exp, token* t) {
+  void register_token(std::string reg_exp, token tok) {
     lexer.register_token(reg_exp,tok);
   }
 
@@ -43,7 +45,7 @@ struct parser {
   }
   
   //==============================================================================
-  // some usefull parser templates (for using in token nud() and led())
+  // some usefull parser combinators (for using in token nud() and led())
   //==============================================================================
   // sequence
   template<typename Parser, typename... Others>

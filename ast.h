@@ -8,44 +8,26 @@
 #ifndef AST_H
 #define AST_H
 
-#include <string>
-#include <vector>
+#include "tree.h"
 
 namespace tdopp {
 
-struct ast {
+struct ast_info {
+  ast_info(int identifier, int begin_pos, int end_pos)
+  : id(identifier), begin(begin_pos), end(end_pos)
+  {}
 
-  ast(int id) 
-    : node_id(id), parent(nullptr), _line(0), _col(0), _length(0)
-    {}
-
-  ~ast() { for(auto c : childs) if (c) delete c; }
-
-  void add_child(ast* child) { 
-    childs.push_back(child);
-    child->set_parent(this);
-  }
-
-  void set_input(int line, int col, int length) { 
-    _line = line; _col = col; _length = length;
-  }
-
-  int id() const { return node_id; }
-  ast* child(int i) { return childs[i]; }
-  int childs_no() const { return childs.size(); }
-  int line() const { return _line; }
-  int col() const { return col; }
-  int length() const { return _length; }
-
-protected:
-
-  int node_id;
-  std::vector< ast* > childs;
-  ast* parent;
-  int _line, _col, _length; // input data
+  int id,
+      begin,  // input position
+      end;
 };
 
-ast* create_ast_node(int id) {  }
+using ast = std::unique_ptr< tree<ast_info> >;
+
+ast ast_node(int id, int begin=0, int end=0)
+{
+  return tree_node(ast_info(id,begin,end));
+}
 
 } // end namespace tdopp
 
